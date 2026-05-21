@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.infra.security;
+package br.csi.viatio.infra.security;
 
 import br.csi.viatio.service.AutenticacaoService;
 import jakarta.servlet.FilterChain;

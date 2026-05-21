@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.model.expense;
+package br.csi.viatio.model.expense;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

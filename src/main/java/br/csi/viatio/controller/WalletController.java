@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.controller;
+package br.csi.viatio.controller;
 
 import br.csi.viatio.model.user.User;
 import br.csi.viatio.model.user.UserRepository;

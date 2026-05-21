@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.service;
+package br.csi.viatio.service;
 
 import br.csi.viatio.model.trip.Trip;
 import br.csi.viatio.model.trip.TripRepository;

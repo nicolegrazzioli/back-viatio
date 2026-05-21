@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.controller;
+package br.csi.viatio.controller;
 
 import br.csi.viatio.model.currencytransaction.CurrencyTransaction;
 import br.csi.viatio.model.currencytransaction.CurrencyTransactionRepository;

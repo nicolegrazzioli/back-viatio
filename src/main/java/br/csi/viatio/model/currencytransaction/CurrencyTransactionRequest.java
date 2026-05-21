@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.model.currencytransaction;
+package br.csi.viatio.model.currencytransaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.service;
+package br.csi.viatio.service;
 
 import br.csi.viatio.model.wallet.Wallet;
 import br.csi.viatio.model.wallet.WalletId;

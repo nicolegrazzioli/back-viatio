@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.model.trip;
+package br.csi.viatio.model.trip;
 
 import java.time.LocalDate;
 

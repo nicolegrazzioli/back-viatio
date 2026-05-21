@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.infra.security;
+package br.csi.viatio.infra.security;
 
 import br.csi.viatio.model.user.User;
 import com.auth0.jwt.JWT;

@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.model.currencytransaction;
+package br.csi.viatio.model.currencytransaction;
 
 import br.csi.viatio.model.user.User;
 import jakarta.persistence.*;

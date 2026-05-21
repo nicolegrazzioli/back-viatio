@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.model.trip;
+package br.csi.viatio.model.trip;
 
 import br.csi.viatio.model.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

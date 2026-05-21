@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.model.expense;
+package br.csi.viatio.model.expense;
 
 import br.csi.viatio.model.trip.Trip;
 import jakarta.persistence.*;

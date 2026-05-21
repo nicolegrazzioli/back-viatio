@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.model.wallet;
+package br.csi.viatio.model.wallet;
 
 import lombok.*;
 import java.io.Serializable;

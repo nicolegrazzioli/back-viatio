@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.infra.security;
+package br.csi.viatio.infra.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

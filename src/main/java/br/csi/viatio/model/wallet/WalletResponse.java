@@ -1,4 +1,4 @@
-﻿package br.csi.viatio.model.wallet;
+package br.csi.viatio.model.wallet;
 
 import java.math.BigDecimal;
 
