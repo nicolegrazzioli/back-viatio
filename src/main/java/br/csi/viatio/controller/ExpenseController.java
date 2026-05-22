@@ -40,7 +40,14 @@ public class ExpenseController {
             return ResponseEntity.badRequest().build();
         }
 
-        Expense expense = new Expense();
+        Expense expense;
+        if (dados.id() != null) {
+            expense = expenseRepository.findById(dados.id()).orElse(new Expense());
+            expense.setId(dados.id());
+        } else {
+            expense = new Expense();
+        }
+
         expense.setTrip(trip);
         expense.setTitle(dados.title());
         expense.setAmount(dados.amount());

@@ -1,7 +1,6 @@
 package br.csi.viatio.model.currencytransaction;
 
 import java.util.UUID;
-
 import br.csi.viatio.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +14,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CurrencyTransaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
@@ -40,4 +38,3 @@ public class CurrencyTransaction {
     @Column(name = "photo_path")
     private String photoPath;
 }
-

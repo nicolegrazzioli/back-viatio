@@ -1,7 +1,6 @@
 package br.csi.viatio.model.expense;
 
 import java.util.UUID;
-
 import br.csi.viatio.model.trip.Trip;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +14,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Expense {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
@@ -44,4 +42,3 @@ public class Expense {
     @Column(name = "photo_path")
     private String photoPath;
 }
-

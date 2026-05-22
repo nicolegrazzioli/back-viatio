@@ -1,7 +1,6 @@
 package br.csi.viatio.model.trip;
 
 import java.util.UUID;
-
 import br.csi.viatio.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +13,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Trip {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
@@ -32,4 +30,3 @@ public class Trip {
     @Column(name = "cover_type")
     private String coverType;
 }
-

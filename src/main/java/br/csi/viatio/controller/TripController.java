@@ -34,7 +34,14 @@ public class TripController {
     public ResponseEntity<TripResponse> create(@RequestBody TripRequest dados) {
         User user = getAuthenticatedUser();
 
-        Trip trip = new Trip();
+        Trip trip;
+        if (dados.id() != null) {
+            trip = tripRepository.findById(dados.id()).orElse(new Trip());
+            trip.setId(dados.id());
+        } else {
+            trip = new Trip();
+        }
+
         trip.setUser(user);
         trip.setTitle(dados.title());
         trip.setStartDate(dados.startDate());

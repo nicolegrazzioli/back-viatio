@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ExpenseRequest(
+    UUID id,
     UUID tripId,
     String title,
     BigDecimal amount,

@@ -36,11 +36,47 @@ public class CurrencyTransactionController {
         return userRepository.findByEmail(email);
     }
 
+    private void recalculateWallet(User user, String currency) {
+        List<CurrencyTransaction> txs = transactionRepository.findByUserAndCurrency(user, currency);
+        WalletId walletId = new WalletId(user.getId(), currency);
+        
+        if (txs.isEmpty()) {
+            walletRepository.findById(walletId).ifPresent(walletRepository::delete);
+            return;
+        }
+
+        BigDecimal totalBalance = BigDecimal.ZERO;
+        BigDecimal totalBrl = BigDecimal.ZERO;
+
+        for (CurrencyTransaction tx : txs) {
+            totalBalance = totalBalance.add(tx.getAmount());
+            totalBrl = totalBrl.add(tx.getAmountBrl());
+        }
+
+        Wallet wallet = walletRepository.findById(walletId).orElse(new Wallet(user, currency, BigDecimal.ZERO, BigDecimal.ZERO));
+        wallet.setBalance(totalBalance);
+        
+        if (totalBalance.compareTo(BigDecimal.ZERO) > 0) {
+            wallet.setAverageVet(totalBrl.divide(totalBalance, 4, RoundingMode.HALF_UP));
+        } else {
+            wallet.setAverageVet(BigDecimal.ZERO);
+        }
+        
+        walletRepository.save(wallet);
+    }
+
     @PostMapping
     public ResponseEntity<CurrencyTransactionResponse> create(@RequestBody CurrencyTransactionRequest dados) {
         User user = getAuthenticatedUser();
 
-        CurrencyTransaction transaction = new CurrencyTransaction();
+        CurrencyTransaction transaction;
+        if (dados.id() != null) {
+            transaction = transactionRepository.findById(dados.id()).orElse(new CurrencyTransaction());
+            transaction.setId(dados.id());
+        } else {
+            transaction = new CurrencyTransaction();
+        }
+        
         transaction.setUser(user);
         transaction.setAmount(dados.amount());
         transaction.setCurrency(dados.currency());
@@ -53,20 +89,8 @@ public class CurrencyTransactionController {
 
         transactionRepository.save(transaction);
 
-        // Atualizar Carteira (Wallet)
-        WalletId walletId = new WalletId(user.getId(), dados.currency());
-        Wallet wallet = walletRepository.findById(walletId).orElse(new Wallet(user, dados.currency(), BigDecimal.ZERO, BigDecimal.ZERO));
-
-        BigDecimal totalBrlAntigo = wallet.getBalance().multiply(wallet.getAverageVet());
-        BigDecimal novoSaldo = wallet.getBalance().add(dados.amount());
-        BigDecimal novoTotalBrl = totalBrlAntigo.add(dados.amountBrl());
-
-        if (novoSaldo.compareTo(BigDecimal.ZERO) > 0) {
-            wallet.setAverageVet(novoTotalBrl.divide(novoSaldo, 4, RoundingMode.HALF_UP));
-        }
-        wallet.setBalance(novoSaldo);
-
-        walletRepository.save(wallet);
+        // Recalcular Carteira (Wallet)
+        recalculateWallet(user, dados.currency());
 
         return ResponseEntity.ok(new CurrencyTransactionResponse(transaction));
     }
@@ -88,24 +112,14 @@ public class CurrencyTransactionController {
             return ResponseEntity.notFound().build();
         }
 
-        // Atualizar carteira (Subtrair)
-        WalletId walletId = new WalletId(transaction.getUser().getId(), transaction.getCurrency());
-        Wallet wallet = walletRepository.findById(walletId).orElse(null);
+        String currency = transaction.getCurrency();
+        User user = transaction.getUser();
         
-        if (wallet != null) {
-            BigDecimal novoSaldo = wallet.getBalance().subtract(transaction.getAmount());
-            if (novoSaldo.compareTo(BigDecimal.ZERO) <= 0) {
-                walletRepository.delete(wallet);
-            } else {
-                BigDecimal totalBrlAntigo = wallet.getBalance().multiply(wallet.getAverageVet());
-                BigDecimal novoTotalBrl = totalBrlAntigo.subtract(transaction.getAmountBrl());
-                wallet.setAverageVet(novoTotalBrl.divide(novoSaldo, 4, RoundingMode.HALF_UP));
-                wallet.setBalance(novoSaldo);
-                walletRepository.save(wallet);
-            }
-        }
-
         transactionRepository.delete(transaction);
+        
+        // Recalcular carteira após deletar
+        recalculateWallet(user, currency);
+        
         return ResponseEntity.noContent().build();
     }
 }
