@@ -25,7 +25,7 @@ public class TokenServiceJWT {
                     .withIssuer("API Viatio")
                     .withSubject(user.getUsername())
                     .withClaim("ROLE", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
-                    .withClaim("id", user.getId())
+                    .withClaim("id", user.getId().toString())
                     .withClaim("name", user.getName())
                     .withExpiresAt(dataExpiracao())
                     .sign(algorithm);

@@ -5,12 +5,14 @@ import java.io.Serializable;
 
 // chave primÃ¡ria composta (ID do usuÃ¡rio + cÃ³digo da moeda)
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 public class WalletId implements Serializable {
-    private Long user;
+    private UUID user;
     private String currency;
 }
 

@@ -1,11 +1,13 @@
 package br.csi.viatio.model.expense;
 
+import java.util.UUID;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ExpenseResponse(
-    Long id,
-    Long tripId,
+    UUID id,
+    UUID tripId,
     String title,
     BigDecimal amount,
     String currency,

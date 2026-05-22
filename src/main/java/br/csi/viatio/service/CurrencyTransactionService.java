@@ -1,5 +1,7 @@
 package br.csi.viatio.service;
 
+import java.util.UUID;
+
 import br.csi.viatio.model.currencytransaction.CurrencyTransaction;
 import br.csi.viatio.model.currencytransaction.CurrencyTransactionRepository;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ public class CurrencyTransactionService {
         return repository.findAll();
     }
 
-    public Optional<CurrencyTransaction> findById(Long id) {
+    public Optional<CurrencyTransaction> findById(UUID id) {
         return repository.findById(id);
     }
 
@@ -27,7 +29,7 @@ public class CurrencyTransactionService {
         return repository.save(transaction);
     }
 
-    public void delete(Long id) {
+    public void delete(UUID id) {
         repository.deleteById(id);
     }
 }

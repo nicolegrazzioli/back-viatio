@@ -1,5 +1,7 @@
 package br.csi.viatio.service;
 
+import java.util.UUID;
+
 import br.csi.viatio.model.user.User;
 import br.csi.viatio.model.user.UserRepository;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ public class UserService {
         return repository.findAll();
     }
 
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(UUID id) {
         return repository.findById(id);
     }
 
@@ -27,7 +29,7 @@ public class UserService {
         return repository.save(user);
     }
 
-    public void delete(Long id) {
+    public void delete(UUID id) {
         repository.deleteById(id);
     }
 }

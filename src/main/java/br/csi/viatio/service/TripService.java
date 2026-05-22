@@ -1,5 +1,7 @@
 package br.csi.viatio.service;
 
+import java.util.UUID;
+
 import br.csi.viatio.model.trip.Trip;
 import br.csi.viatio.model.trip.TripRepository;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ public class TripService {
         return repository.findAll();
     }
 
-    public Optional<Trip> findById(Long id) {
+    public Optional<Trip> findById(UUID id) {
         return repository.findById(id);
     }
 
@@ -27,7 +29,7 @@ public class TripService {
         return repository.save(trip);
     }
 
-    public void delete(Long id) {
+    public void delete(UUID id) {
         repository.deleteById(id);
     }
 }

@@ -1,9 +1,11 @@
 package br.csi.viatio.model.trip;
 
+import java.util.UUID;
+
 import java.time.LocalDate;
 
 public record TripResponse(
-    Long id,
+    UUID id,
     String title,
     LocalDate startDate,
     LocalDate endDate,

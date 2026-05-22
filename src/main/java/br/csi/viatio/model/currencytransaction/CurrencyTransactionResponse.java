@@ -1,10 +1,12 @@
 package br.csi.viatio.model.currencytransaction;
 
+import java.util.UUID;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record CurrencyTransactionResponse(
-    Long id,
+    UUID id,
     BigDecimal amount,
     String currency,
     BigDecimal amountBrl,

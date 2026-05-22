@@ -1,5 +1,7 @@
 package br.csi.viatio.controller;
 
+import java.util.UUID;
+
 import br.csi.viatio.model.trip.Trip;
 import br.csi.viatio.model.trip.TripRepository;
 import br.csi.viatio.model.trip.TripRequest;
@@ -54,7 +56,7 @@ public class TripController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         Trip trip = tripRepository.findById(id).orElse(null);
         if (trip == null || !trip.getUser().getId().equals(getAuthenticatedUser().getId())) {
             return ResponseEntity.notFound().build();

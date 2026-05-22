@@ -1,5 +1,7 @@
 package br.csi.viatio.controller;
 
+import java.util.UUID;
+
 import br.csi.viatio.model.currencytransaction.CurrencyTransaction;
 import br.csi.viatio.model.currencytransaction.CurrencyTransactionRepository;
 import br.csi.viatio.model.currencytransaction.CurrencyTransactionRequest;
@@ -80,7 +82,7 @@ public class CurrencyTransactionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         CurrencyTransaction transaction = transactionRepository.findById(id).orElse(null);
         if (transaction == null || !transaction.getUser().getId().equals(getAuthenticatedUser().getId())) {
             return ResponseEntity.notFound().build();

@@ -1,5 +1,7 @@
 package br.csi.viatio.controller;
 
+import java.util.UUID;
+
 import br.csi.viatio.model.expense.Expense;
 import br.csi.viatio.model.expense.ExpenseRepository;
 import br.csi.viatio.model.expense.ExpenseRequest;
@@ -56,7 +58,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/trip/{tripId}")
-    public ResponseEntity<List<ExpenseResponse>> listByTrip(@PathVariable Long tripId) {
+    public ResponseEntity<List<ExpenseResponse>> listByTrip(@PathVariable UUID tripId) {
         Trip trip = tripRepository.findById(tripId).orElse(null);
         if (trip == null || !trip.getUser().getId().equals(getAuthenticatedUser().getId())) {
             return ResponseEntity.notFound().build();
@@ -70,7 +72,7 @@ public class ExpenseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         Expense expense = expenseRepository.findById(id).orElse(null);
         if (expense == null || !expense.getTrip().getUser().getId().equals(getAuthenticatedUser().getId())) {
             return ResponseEntity.notFound().build();
