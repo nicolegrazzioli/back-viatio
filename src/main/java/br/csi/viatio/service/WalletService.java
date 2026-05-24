@@ -1,5 +1,6 @@
 package br.csi.viatio.service;
 
+import br.csi.viatio.model.user.User;
 import br.csi.viatio.model.wallet.Wallet;
 import br.csi.viatio.model.wallet.WalletId;
 import br.csi.viatio.model.wallet.WalletRepository;
@@ -16,20 +17,8 @@ public class WalletService {
         this.repository = repository;
     }
 
-    public List<Wallet> findAll() {
-        return repository.findAll();
-    }
-
-    public Optional<Wallet> findById(WalletId id) {
-        return repository.findById(id);
-    }
-
-    public Wallet save(Wallet wallet) {
-        return repository.save(wallet);
-    }
-
-    public void delete(WalletId id) {
-        repository.deleteById(id);
+    public List<Wallet> listByUser(User user) {
+        return repository.findByUser(user);
     }
 }
 

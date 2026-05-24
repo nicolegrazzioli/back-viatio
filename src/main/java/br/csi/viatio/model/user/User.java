@@ -1,12 +1,15 @@
 package br.csi.viatio.model.user;
 
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,6 +30,14 @@ public class User implements UserDetails {
     
     @Column(name = "profile_image")
     private String profileImage;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -58,4 +69,3 @@ public class User implements UserDetails {
         return true;
     }
 }
-

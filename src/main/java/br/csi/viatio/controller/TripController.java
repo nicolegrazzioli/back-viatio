@@ -3,16 +3,17 @@ package br.csi.viatio.controller;
 import java.util.UUID;
 
 import br.csi.viatio.model.trip.Trip;
-import br.csi.viatio.model.trip.TripRepository;
 import br.csi.viatio.model.trip.TripRequest;
 import br.csi.viatio.model.trip.TripResponse;
 import br.csi.viatio.model.user.User;
 import br.csi.viatio.model.user.UserRepository;
+import br.csi.viatio.service.TripService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TripController {
 
-    private final TripRepository tripRepository;
+    private final TripService tripService;
     private final UserRepository userRepository;
 
     private User getAuthenticatedUser() {
@@ -31,31 +32,16 @@ public class TripController {
     }
 
     @PostMapping
-    public ResponseEntity<TripResponse> create(@RequestBody TripRequest dados) {
+    public ResponseEntity<TripResponse> create(@Valid @RequestBody TripRequest dados) {
         User user = getAuthenticatedUser();
-
-        Trip trip;
-        if (dados.id() != null) {
-            trip = tripRepository.findById(dados.id()).orElse(new Trip());
-            trip.setId(dados.id());
-        } else {
-            trip = new Trip();
-        }
-
-        trip.setUser(user);
-        trip.setTitle(dados.title());
-        trip.setStartDate(dados.startDate());
-        trip.setEndDate(dados.endDate());
-        trip.setCoverType(dados.coverType());
-
-        tripRepository.save(trip);
+        Trip trip = tripService.createTrip(dados, user);
         return ResponseEntity.ok(new TripResponse(trip));
     }
 
     @GetMapping
     public ResponseEntity<List<TripResponse>> listAll() {
         User user = getAuthenticatedUser();
-        List<TripResponse> trips = tripRepository.findByUser(user)
+        List<TripResponse> trips = tripService.listByUser(user)
                 .stream()
                 .map(TripResponse::new)
                 .toList();
@@ -64,11 +50,8 @@ public class TripController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        Trip trip = tripRepository.findById(id).orElse(null);
-        if (trip == null || !trip.getUser().getId().equals(getAuthenticatedUser().getId())) {
-            return ResponseEntity.notFound().build();
-        }
-        tripRepository.delete(trip);
+        User user = getAuthenticatedUser();
+        tripService.deleteTrip(id, user);
         return ResponseEntity.noContent().build();
     }
 }

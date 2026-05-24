@@ -2,8 +2,8 @@ package br.csi.viatio.controller;
 
 import br.csi.viatio.model.user.User;
 import br.csi.viatio.model.user.UserRepository;
-import br.csi.viatio.model.wallet.WalletRepository;
 import br.csi.viatio.model.wallet.WalletResponse;
+import br.csi.viatio.service.WalletService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class WalletController {
 
-    private final WalletRepository walletRepository;
+    private final WalletService walletService;
     private final UserRepository userRepository;
 
     private User getAuthenticatedUser() {
@@ -31,11 +31,12 @@ public class WalletController {
     @GetMapping
     public ResponseEntity<List<WalletResponse>> listAll() {
         User user = getAuthenticatedUser();
-        List<WalletResponse> wallets = walletRepository.findByUser(user)
+        List<WalletResponse> wallets = walletService.listByUser(user)
                 .stream()
                 .map(WalletResponse::new)
                 .toList();
         return ResponseEntity.ok(wallets);
     }
 }
+
 
