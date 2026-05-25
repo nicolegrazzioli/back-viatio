@@ -15,9 +15,13 @@ import org.springframework.stereotype.Service;
 public class TripService {
 
     private final TripRepository repository;
+    private final br.csi.viatio.model.expense.ExpenseRepository expenseRepository;
+    private final CurrencyTransactionService currencyTransactionService;
 
-    public TripService(TripRepository repository) {
+    public TripService(TripRepository repository, br.csi.viatio.model.expense.ExpenseRepository expenseRepository, CurrencyTransactionService currencyTransactionService) {
         this.repository = repository;
+        this.expenseRepository = expenseRepository;
+        this.currencyTransactionService = currencyTransactionService;
     }
 
     public Trip createTrip(TripRequest dados, User user) {
@@ -35,7 +39,17 @@ public class TripService {
         trip.setEndDate(dados.endDate());
         trip.setCoverType(dados.coverType());
 
-        return repository.save(trip);
+        Trip savedTrip = repository.save(trip);
+        
+        if (dados.id() != null) {
+            // Se for edição, pode ter mudado a data. Recalcular VET para as moedas da viagem.
+            List<br.csi.viatio.model.expense.Expense> expenses = expenseRepository.findByTrip(savedTrip);
+            expenses.stream().map(e -> e.getCurrency()).distinct().forEach(currency -> {
+                currencyTransactionService.recalculateWallet(user, currency);
+            });
+        }
+        
+        return savedTrip;
     }
 
     public List<Trip> listByUser(User user) {
@@ -50,6 +64,13 @@ public class TripService {
             throw new ForbiddenException("Você não tem permissão para deletar esta viagem.");
         }
         
+        List<br.csi.viatio.model.expense.Expense> expenses = expenseRepository.findByTrip(trip);
+        List<String> currencies = expenses.stream().map(e -> e.getCurrency()).distinct().toList();
+        
         repository.delete(trip);
+        
+        currencies.forEach(currency -> {
+            currencyTransactionService.recalculateWallet(user, currency);
+        });
     }
 }

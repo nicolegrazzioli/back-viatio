@@ -24,11 +24,13 @@ public class CurrencyTransactionService {
     private final CurrencyTransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
     private final ExpenseRepository expenseRepository;
+    private final br.csi.viatio.model.trip.TripRepository tripRepository;
 
-    public CurrencyTransactionService(CurrencyTransactionRepository transactionRepository, WalletRepository walletRepository, ExpenseRepository expenseRepository) {
+    public CurrencyTransactionService(CurrencyTransactionRepository transactionRepository, WalletRepository walletRepository, ExpenseRepository expenseRepository, br.csi.viatio.model.trip.TripRepository tripRepository) {
         this.transactionRepository = transactionRepository;
         this.walletRepository = walletRepository;
         this.expenseRepository = expenseRepository;
+        this.tripRepository = tripRepository;
     }
 
     public void recalculateWallet(User user, String currency) {
@@ -78,9 +80,32 @@ public class CurrencyTransactionService {
         wallet.setAverageVet(newVet);
         walletRepository.save(wallet);
 
-        // Se o VET mudou, aplica o recálculo dinâmico aos gastos da viagem que usam Custo Médio
-        if (oldVet != null && newVet.compareTo(oldVet) != 0) {
-            expenseRepository.updateDynamicVet(user, currency, newVet);
+        // Se o VET mudou (ou mesmo se não mudou globalmente, mas as transações mudaram), aplica o recálculo dinâmico por viagem
+        List<br.csi.viatio.model.trip.Trip> trips = tripRepository.findByUser(user);
+        for (br.csi.viatio.model.trip.Trip trip : trips) {
+            java.time.LocalDate cutoffDate = trip.getEndDate();
+            
+            BigDecimal tripBought = BigDecimal.ZERO;
+            BigDecimal tripBrl = BigDecimal.ZERO;
+            
+            for (CurrencyTransaction tx : txs) {
+                if (cutoffDate == null || !tx.getDate().isAfter(cutoffDate)) {
+                    tripBought = tripBought.add(tx.getAmount());
+                    tripBrl = tripBrl.add(tx.getAmountBrl());
+                }
+            }
+            
+            BigDecimal tripVet = BigDecimal.ZERO;
+            if (tripBought.compareTo(BigDecimal.ZERO) > 0) {
+                tripVet = tripBrl.divide(tripBought, 4, RoundingMode.HALF_UP);
+            } else if (totalBought.compareTo(BigDecimal.ZERO) > 0) {
+                // Fallback para VET global se não houver compras antes do fim da viagem
+                tripVet = totalBrl.divide(totalBought, 4, RoundingMode.HALF_UP);
+            }
+            
+            if (tripVet.compareTo(BigDecimal.ZERO) > 0) {
+                expenseRepository.updateTripExpensesVet(trip.getId(), currency, tripVet);
+            }
         }
     }
 

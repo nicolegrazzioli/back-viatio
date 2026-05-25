@@ -21,6 +21,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE Expense e SET e.exchangeRate = :newVet, e.amountBrl = e.amount * :newVet WHERE e.trip.user = :user AND e.currency = :currency AND e.isAverageCost = true")
-    void updateDynamicVet(User user, String currency, BigDecimal newVet);
+    @Query("UPDATE Expense e SET e.exchangeRate = :newVet, e.amountBrl = e.amount * :newVet WHERE e.trip.id = :tripId AND e.currency = :currency AND e.isAverageCost = true")
+    void updateTripExpensesVet(UUID tripId, String currency, BigDecimal newVet);
 }
