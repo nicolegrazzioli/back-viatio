@@ -98,9 +98,8 @@ public class CurrencyTransactionService {
             BigDecimal tripVet = BigDecimal.ZERO;
             if (tripBought.compareTo(BigDecimal.ZERO) > 0) {
                 tripVet = tripBrl.divide(tripBought, 4, RoundingMode.HALF_UP);
-            } else if (totalBought.compareTo(BigDecimal.ZERO) > 0) {
-                // Fallback para VET global se não houver compras antes do fim da viagem
-                tripVet = totalBrl.divide(totalBought, 4, RoundingMode.HALF_UP);
+            } else {
+                tripVet = BigDecimal.ONE;
             }
             
             if (tripVet.compareTo(BigDecimal.ZERO) > 0) {

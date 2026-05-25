@@ -67,6 +67,7 @@ public class TripService {
         List<br.csi.viatio.model.expense.Expense> expenses = expenseRepository.findByTrip(trip);
         List<String> currencies = expenses.stream().map(e -> e.getCurrency()).distinct().toList();
         
+        expenseRepository.deleteAll(expenses);
         repository.delete(trip);
         
         currencies.forEach(currency -> {
