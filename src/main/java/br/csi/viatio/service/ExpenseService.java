@@ -18,10 +18,12 @@ public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
     private final TripRepository tripRepository;
+    private final CurrencyTransactionService currencyTransactionService;
 
-    public ExpenseService(ExpenseRepository expenseRepository, TripRepository tripRepository) {
+    public ExpenseService(ExpenseRepository expenseRepository, TripRepository tripRepository, CurrencyTransactionService currencyTransactionService) {
         this.expenseRepository = expenseRepository;
         this.tripRepository = tripRepository;
+        this.currencyTransactionService = currencyTransactionService;
     }
 
     public Expense createExpense(ExpenseRequest dados, User user) {
@@ -33,9 +35,11 @@ public class ExpenseService {
         }
 
         Expense expense;
+        String oldCurrency = null;
         if (dados.id() != null) {
             expense = expenseRepository.findById(dados.id()).orElse(new Expense());
             expense.setId(dados.id());
+            oldCurrency = expense.getCurrency();
         } else {
             expense = new Expense();
         }
@@ -52,7 +56,17 @@ public class ExpenseService {
         expense.setDescription(dados.description());
         expense.setPhotoPath(dados.photoPath());
 
-        return expenseRepository.save(expense);
+        Expense saved = expenseRepository.save(expense);
+        
+        currencyTransactionService.recalculateWallet(user, saved.getCurrency());
+
+        if (oldCurrency != null) {
+            if (!oldCurrency.equals(saved.getCurrency())) {
+                currencyTransactionService.recalculateWallet(user, oldCurrency);
+            }
+        }
+        
+        return saved;
     }
 
     public List<Expense> listByTrip(UUID tripId, User user) {
@@ -74,6 +88,10 @@ public class ExpenseService {
             throw new ForbiddenException("Você não tem permissão para deletar esta despesa.");
         }
 
+        String currency = expense.getCurrency();
+
         expenseRepository.delete(expense);
+        
+        currencyTransactionService.recalculateWallet(user, currency);
     }
 }

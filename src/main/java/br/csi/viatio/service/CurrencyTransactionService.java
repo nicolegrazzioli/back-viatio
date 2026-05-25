@@ -14,6 +14,8 @@ import br.csi.viatio.model.user.User;
 import br.csi.viatio.model.wallet.Wallet;
 import br.csi.viatio.model.wallet.WalletId;
 import br.csi.viatio.model.wallet.WalletRepository;
+import br.csi.viatio.model.expense.Expense;
+import br.csi.viatio.model.expense.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,13 +23,15 @@ public class CurrencyTransactionService {
 
     private final CurrencyTransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
+    private final ExpenseRepository expenseRepository;
 
-    public CurrencyTransactionService(CurrencyTransactionRepository transactionRepository, WalletRepository walletRepository) {
+    public CurrencyTransactionService(CurrencyTransactionRepository transactionRepository, WalletRepository walletRepository, ExpenseRepository expenseRepository) {
         this.transactionRepository = transactionRepository;
         this.walletRepository = walletRepository;
+        this.expenseRepository = expenseRepository;
     }
 
-    private void recalculateWallet(User user, String currency) {
+    public void recalculateWallet(User user, String currency) {
         List<CurrencyTransaction> txs = transactionRepository.findByUserAndCurrency(user, currency);
         WalletId walletId = new WalletId(user.getId(), currency);
         
@@ -36,13 +40,22 @@ public class CurrencyTransactionService {
             return;
         }
 
-        BigDecimal totalBalance = BigDecimal.ZERO;
+        BigDecimal totalBought = BigDecimal.ZERO;
         BigDecimal totalBrl = BigDecimal.ZERO;
 
         for (CurrencyTransaction tx : txs) {
-            totalBalance = totalBalance.add(tx.getAmount());
+            totalBought = totalBought.add(tx.getAmount());
             totalBrl = totalBrl.add(tx.getAmountBrl());
         }
+
+        // Subtrai os gastos pagos com a carteira (agora simplificado, todo gasto na moeda da carteira desconta)
+        List<Expense> expenses = expenseRepository.findByTrip_UserAndCurrency(user, currency);
+        BigDecimal totalSpent = BigDecimal.ZERO;
+        for (Expense exp : expenses) {
+            totalSpent = totalSpent.add(exp.getAmount());
+        }
+
+        BigDecimal remainingBalance = totalBought.subtract(totalSpent);
 
         Wallet wallet = walletRepository.findById(walletId).orElseGet(() -> {
             Wallet w = new Wallet();
@@ -52,15 +65,23 @@ public class CurrencyTransactionService {
             w.setAverageVet(BigDecimal.ZERO);
             return w;
         });
-        wallet.setBalance(totalBalance);
         
-        if (totalBalance.compareTo(BigDecimal.ZERO) > 0) {
-            wallet.setAverageVet(totalBrl.divide(totalBalance, 4, RoundingMode.HALF_UP));
-        } else {
-            wallet.setAverageVet(BigDecimal.ZERO);
+        BigDecimal oldVet = wallet.getAverageVet();
+        BigDecimal newVet = BigDecimal.ZERO;
+        
+        wallet.setBalance(remainingBalance);
+        
+        if (totalBought.compareTo(BigDecimal.ZERO) > 0) {
+            newVet = totalBrl.divide(totalBought, 4, RoundingMode.HALF_UP);
         }
         
+        wallet.setAverageVet(newVet);
         walletRepository.save(wallet);
+
+        // Se o VET mudou, aplica o recálculo dinâmico aos gastos da viagem que usam Custo Médio
+        if (oldVet != null && newVet.compareTo(oldVet) != 0) {
+            expenseRepository.updateDynamicVet(user, currency, newVet);
+        }
     }
 
     public CurrencyTransaction createTransaction(CurrencyTransactionRequest dados, User user) {
