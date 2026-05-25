@@ -124,7 +124,7 @@ public class CurrencyTransactionService {
         transaction.setSource(dados.source());
         transaction.setDate(dados.date());
         transaction.setVetRate(dados.vetRate());
-        transaction.setDescription(dados.description());
+
         transaction.setPhotoPath(dados.photoPath());
 
         transaction = transactionRepository.save(transaction);

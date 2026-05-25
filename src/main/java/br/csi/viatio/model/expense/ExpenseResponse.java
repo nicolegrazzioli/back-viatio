@@ -16,7 +16,6 @@ public record ExpenseResponse(
     Boolean isAverageCost,
     BigDecimal exchangeRate,
     BigDecimal amountBrl,
-    String description,
     String photoPath
 ) {
     public ExpenseResponse(Expense expense) {
@@ -31,9 +30,7 @@ public record ExpenseResponse(
             expense.getIsAverageCost(),
             expense.getExchangeRate(),
             expense.getAmountBrl(),
-            expense.getDescription(),
             expense.getPhotoPath()
         );
     }
 }
-

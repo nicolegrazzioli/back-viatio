@@ -36,8 +36,6 @@ public class CurrencyTransaction {
     @Column(name = "vet_rate")
     private BigDecimal vetRate;
 
-    private String description;
-
     @Column(name = "photo_path")
     private String photoPath;
 

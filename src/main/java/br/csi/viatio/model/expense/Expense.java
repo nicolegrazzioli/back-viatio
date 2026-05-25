@@ -40,8 +40,6 @@ public class Expense {
     @Column(name = "amount_brl")
     private BigDecimal amountBrl;
 
-    private String description;
-
     @Column(name = "photo_path")
     private String photoPath;
 

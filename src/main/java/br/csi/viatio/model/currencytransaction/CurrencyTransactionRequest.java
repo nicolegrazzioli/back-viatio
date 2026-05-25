@@ -27,7 +27,5 @@ public record CurrencyTransactionRequest(
     @NotNull(message = "A taxa VET é obrigatória")
     BigDecimal vetRate,
     
-    String description,
     String photoPath
 ) {}
-

@@ -53,7 +53,7 @@ public class ExpenseService {
         expense.setIsAverageCost(dados.isAverageCost());
         expense.setExchangeRate(dados.exchangeRate());
         expense.setAmountBrl(dados.amountBrl());
-        expense.setDescription(dados.description());
+
         expense.setPhotoPath(dados.photoPath());
 
         Expense saved = expenseRepository.save(expense);

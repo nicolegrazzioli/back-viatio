@@ -13,7 +13,6 @@ public record CurrencyTransactionResponse(
     String source,
     LocalDate date,
     BigDecimal vetRate,
-    String description,
     String photoPath
 ) {
     public CurrencyTransactionResponse(CurrencyTransaction transaction) {
@@ -25,9 +24,7 @@ public record CurrencyTransactionResponse(
             transaction.getSource(),
             transaction.getDate(),
             transaction.getVetRate(),
-            transaction.getDescription(),
             transaction.getPhotoPath()
         );
     }
 }
-

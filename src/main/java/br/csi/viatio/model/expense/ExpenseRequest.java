@@ -30,7 +30,5 @@ public record ExpenseRequest(
     Boolean isAverageCost,
     BigDecimal exchangeRate,
     BigDecimal amountBrl,
-    String description,
     String photoPath
 ) {}
-
