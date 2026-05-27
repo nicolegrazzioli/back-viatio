@@ -1,7 +1,7 @@
 package br.csi.viatio.infra;
 
-import br.csi.viatio.model.user.User;
-import br.csi.viatio.model.user.UserRepository;
+import br.csi.viatio.model.User;
+import br.csi.viatio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

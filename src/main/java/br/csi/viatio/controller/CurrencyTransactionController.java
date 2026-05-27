@@ -1,13 +1,12 @@
 package br.csi.viatio.controller;
-
 import java.util.UUID;
 import java.util.List;
 
-import br.csi.viatio.model.currencytransaction.CurrencyTransaction;
-import br.csi.viatio.model.currencytransaction.CurrencyTransactionRequest;
-import br.csi.viatio.model.currencytransaction.CurrencyTransactionResponse;
-import br.csi.viatio.model.user.User;
-import br.csi.viatio.model.user.UserRepository;
+import br.csi.viatio.model.CurrencyTransaction;
+import br.csi.viatio.dto.currencytransaction.CurrencyTransactionRequest;
+import br.csi.viatio.dto.currencytransaction.CurrencyTransactionResponse;
+import br.csi.viatio.model.User;
+import br.csi.viatio.repository.UserRepository;
 import br.csi.viatio.service.CurrencyTransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+// recebe compra de moeda do celular e lista/remove do banco de dados
+
+// Controlador REST para gerenciar as transações de compra de moedas estrangeiras
 @RestController
 @RequestMapping("/currency-transactions")
 @AllArgsConstructor
@@ -24,33 +26,57 @@ public class CurrencyTransactionController {
     private final CurrencyTransactionService transactionService;
     private final UserRepository userRepository;
 
+    // Mérodo auxiliar para buscar as informações do usuário autenticado pelo token JWT
     private User getAuthenticatedUser() {
+        // Busca o principal (objeto com os detalhes basicos do usuario autenticado a partir do token JWT)
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // transforma o objeto principal em UserDetais (padrao) e extrai nome (email)
         String email = ((UserDetails) principal).getUsername();
+        // busca objeto User a partir do email
         return userRepository.findByEmail(email);
     }
 
+    // ENDPOINT para registrar uma compra de moeda estrangeira
+    // ResponseEntity = resposta HTTP terá um corpo de dados e codigo de status
+    // spring le o corpo json enviado pelo app flutter e converte no objeto CurrencyTransactionRequest dados
     @PostMapping
     public ResponseEntity<CurrencyTransactionResponse> create(@Valid @RequestBody CurrencyTransactionRequest dados) {
+        // Pega o usuário logado
         User user = getAuthenticatedUser();
+        
+        // Aciona o service para registrar a transação de compra associada ao usuário
         CurrencyTransaction transaction = transactionService.createTransaction(dados, user);
+        
+        // Retorna a transação criada formatada como DTO com status 200 OK para o flutter
         return ResponseEntity.ok(new CurrencyTransactionResponse(transaction));
     }
 
+    // ENDPOINT para listar todas as transações de moedas do usuário logado
     @GetMapping
     public ResponseEntity<List<CurrencyTransactionResponse>> listAll() {
+        // Pega o usuário atual
         User user = getAuthenticatedUser();
+        
+        // Busca a lista de transações do usuário no banco e converte em DTOs formatados
+        // .stream().map(CurrencyTransactionResponse::new) - pega a lista de entidades originais do banco e passa cada uma pelo construtor do DTO CurrencyTransactionResponse
         List<CurrencyTransactionResponse> transactions = transactionService.listByUser(user)
                 .stream()
                 .map(CurrencyTransactionResponse::new)
                 .toList();
+                
         return ResponseEntity.ok(transactions);
     }
 
+    // ENDPOINT para remover uma compra de moeda específica pelo UUID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        // Pega o usuário logado na requisição
         User user = getAuthenticatedUser();
+        
+        // Solicita a exclusão do registro ao serviço, validando se ele pertence ao usuário
         transactionService.deleteTransaction(id, user);
+        
+        // Retorna 204 No Content se a exclusão for realizada com sucesso
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,22 +1,23 @@
 package br.csi.viatio.service;
 
-import br.csi.viatio.model.user.User;
+import br.csi.viatio.model.User;
 import br.csi.viatio.model.wallet.Wallet;
-import br.csi.viatio.model.wallet.WalletId;
-import br.csi.viatio.model.wallet.WalletRepository;
+import br.csi.viatio.repository.WalletRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 
+// Classe de serviço responsável pelas regras de negócio da carteira consolidada
 @Service
 public class WalletService {
 
     private final WalletRepository repository;
 
+    // Construtor com injeção automática de dependência do repositório de carteiras
     public WalletService(WalletRepository repository) {
         this.repository = repository;
     }
 
+    // Busca no banco e retorna todas as carteiras e saldos pertencentes ao usuário informado
     public List<Wallet> listByUser(User user) {
         return repository.findByUser(user);
     }

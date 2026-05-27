@@ -1,6 +1,6 @@
 package br.csi.viatio.model.wallet;
 
-import br.csi.viatio.model.user.User;
+import br.csi.viatio.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;

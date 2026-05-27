@@ -1,6 +1,6 @@
 package br.csi.viatio.infra.security;
 
-import br.csi.viatio.model.user.User;
+import br.csi.viatio.model.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
@@ -48,7 +48,7 @@ public class TokenServiceJWT {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException e) {
-            throw new RuntimeException("Token invÃ¡lido ou expirado");
+            throw new RuntimeException("Token inválido ou expirado");
         }
     }
 }

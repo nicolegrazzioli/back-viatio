@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import br.csi.viatio.model.user.User;
-import br.csi.viatio.model.user.UserRepository;
+import br.csi.viatio.model.User;
+import br.csi.viatio.repository.UserRepository;
 
 @SpringBootApplication
 public class ViatioApplication {
