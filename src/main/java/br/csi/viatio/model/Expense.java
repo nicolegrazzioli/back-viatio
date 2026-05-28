@@ -12,7 +12,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "expenses")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Expense {
@@ -50,4 +51,17 @@ public class Expense {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Expense expense = (Expense) o;
+        return id != null && id.equals(expense.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

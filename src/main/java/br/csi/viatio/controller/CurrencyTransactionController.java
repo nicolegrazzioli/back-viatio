@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 // recebe compra de moeda do celular e lista/remove do banco de dados
 
@@ -19,6 +21,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/currency-transactions")
 @RequiredArgsConstructor
+@Tag(name = "Transações de Moedas", description = "Endpoints para registro de compra de moedas estrangeiras e cálculo do VET")
 public class CurrencyTransactionController {
 
     private final CurrencyTransactionService transactionService;
@@ -26,6 +29,7 @@ public class CurrencyTransactionController {
     // ENDPOINT para registrar uma compra de moeda estrangeira
     // ResponseEntity = resposta HTTP terá um corpo de dados e codigo de status
     // spring le o corpo json enviado pelo app flutter e converte no objeto CurrencyTransactionRequest dados
+    @Operation(summary = "Registra ou atualiza uma compra de moeda estrangeira")
     @PostMapping
     public ResponseEntity<CurrencyTransactionResponse> create(@Valid @RequestBody CurrencyTransactionRequest dados, @AuthenticationPrincipal User user) {
         // Aciona o service para registrar a transação de compra associada ao usuário
@@ -36,6 +40,7 @@ public class CurrencyTransactionController {
     }
 
     // ENDPOINT para listar todas as transações de moedas do usuário logado
+    @Operation(summary = "Lista todas as compras de moedas do usuário autenticado")
     @GetMapping
     public ResponseEntity<List<CurrencyTransactionResponse>> listAll(@AuthenticationPrincipal User user) {
         // Busca a lista de transações do usuário no banco e converte em DTOs formatados
@@ -49,6 +54,7 @@ public class CurrencyTransactionController {
     }
 
     // ENDPOINT para remover uma compra de moeda específica pelo UUID
+    @Operation(summary = "Remove um registro de compra de moeda pelo UUID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id, @AuthenticationPrincipal User user) {
         // Solicita a exclusão do registro ao serviço, validando se ele pertence ao usuário

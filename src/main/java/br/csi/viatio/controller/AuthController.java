@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 // login e cadastro
 
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 // Lombok gera automaticamente o construtor com os campos finais (injeção de dependência)
 @RequiredArgsConstructor
+@Tag(name = "Autenticação", description = "Endpoints para login e cadastro de usuários")
 public class AuthController {
 
     private final AuthenticationManager manager;
@@ -34,8 +38,9 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
 
     // ENDPOINT de login do usuário: valida as credenciais e retorna o token de acesso
+    @Operation(summary = "Autentica um usuário e retorna o token JWT")
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest dados) { // Recebe dados do DTO
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest dados) { // Recebe dados do DTO
         // Envelopa o email e senha recebidos no corpo da requisição em um token do Spring Security
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.password());
         
@@ -53,8 +58,9 @@ public class AuthController {
     }
 
     // ENDPOINT de cadastro de novos usuários
+    @Operation(summary = "Registra um novo usuário no sistema")
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest dados) {
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest dados) {
         // Verifica no banco de dados se o e-mail informado já está cadastrado
         if (userRepository.findByEmail(dados.email()) != null) {
             // Se já existir cadastro com o e-mail, retorna erro 400 (Bad Request)

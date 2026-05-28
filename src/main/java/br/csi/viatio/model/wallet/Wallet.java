@@ -11,7 +11,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "wallets")
 @IdClass(WalletId.class)
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Wallet {
@@ -36,5 +37,18 @@ public class Wallet {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Wallet wallet = (Wallet) o;
+        return user != null && currency != null && user.getId().equals(wallet.user.getId()) && currency.equals(wallet.currency);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
 

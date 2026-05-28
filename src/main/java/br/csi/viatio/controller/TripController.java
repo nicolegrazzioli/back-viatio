@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
@@ -19,11 +21,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/trips")
 @RequiredArgsConstructor
+@Tag(name = "Viagens", description = "Endpoints para gerenciamento das viagens do usuário")
 public class TripController {
 
     private final TripService tripService;
 
     // ENDPOINT para criar uma nova viagem
+    @Operation(summary = "Cria uma nova viagem associada ao usuário autenticado")
     @PostMapping
     public ResponseEntity<TripResponse> create(@Valid @RequestBody TripRequest dados, @AuthenticationPrincipal User user) {
         // Solicita ao serviço a criação do registro de viagem associada a este usuário
@@ -34,6 +38,7 @@ public class TripController {
     }
 
     // ENDPOINT para listar todas as viagens associadas ao usuário logado
+    @Operation(summary = "Lista todas as viagens cadastradas pelo usuário")
     @GetMapping
     public ResponseEntity<List<TripResponse>> listAll(@AuthenticationPrincipal User user) {
         // Busca as viagens do usuário no banco e converte a lista em DTOs simplificados
@@ -46,6 +51,7 @@ public class TripController {
     }
 
     // ENDPOINT para excluir uma viagem específica pelo seu identificador único UUID
+    @Operation(summary = "Exclui uma viagem usando seu UUID único")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id, @AuthenticationPrincipal User user) {
         // Solicita a remoção da viagem, validando se ela realmente pertence ao usuário atual

@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
@@ -19,11 +21,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/expenses")
 @RequiredArgsConstructor
+@Tag(name = "Despesas", description = "Endpoints para gerenciamento das despesas das viagens")
 public class ExpenseController {
 
     private final ExpenseService expenseService;
 
     // ENDPOINT para registrar uma nova despesa em uma viagem
+    @Operation(summary = "Registra uma nova despesa em uma viagem específica")
     @PostMapping
     public ResponseEntity<ExpenseResponse> create(@Valid @RequestBody ExpenseRequest dados, @AuthenticationPrincipal User user) {
         // Aciona o service para registrar a despesa associada ao usuário logado
@@ -34,6 +38,7 @@ public class ExpenseController {
     }
 
     // ENDPOINT para buscar todas as despesas vinculadas a uma viagem específica
+    @Operation(summary = "Lista todas as despesas de uma viagem")
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<List<ExpenseResponse>> listByTrip(@PathVariable UUID tripId, @AuthenticationPrincipal User user) {
         // Carrega as despesas da viagem informada, validando se a viagem pertence ao usuário logado
@@ -46,6 +51,7 @@ public class ExpenseController {
     }
 
     // ENDPOINT para excluir uma despesa pelo seu identificador único UUID
+    @Operation(summary = "Exclui uma despesa pelo seu identificador único UUID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id, @AuthenticationPrincipal User user) {
         // Solicita ao serviço a remoção da despesa, garantindo que o usuário é o dono do registro
