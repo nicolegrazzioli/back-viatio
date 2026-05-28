@@ -12,6 +12,7 @@ import br.csi.viatio.dto.trip.TripRequest;
 import br.csi.viatio.model.User;
 import br.csi.viatio.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 // Classe de serviço responsável por conter a lógica de negócios referente às viagens
 @Service
@@ -29,6 +30,7 @@ public class TripService {
     }
 
     // Cria ou edita uma viagem
+    @Transactional
     public Trip createTrip(TripRequest dados, User user) {
         Trip trip;
         // Se a requisição contiver um ID, significa que é uma atualização de viagem existente
@@ -62,11 +64,13 @@ public class TripService {
     }
 
     // Lista todas as viagens salvas que pertencem a um determinado usuário
+    @Transactional(readOnly = true)
     public List<Trip> listByUser(User user) {
         return repository.findByUser(user);
     }
 
     // Remove uma viagem do banco de dados e limpa seus vínculos
+    @Transactional
     public void deleteTrip(UUID id, User user) {
         // Busca a viagem pelo ID. Se não encontrar, joga exceção de Recurso Não Encontrado (404)
         Trip trip = repository.findById(id)

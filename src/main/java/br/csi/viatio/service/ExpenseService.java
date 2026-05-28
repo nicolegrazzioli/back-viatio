@@ -12,6 +12,7 @@ import br.csi.viatio.model.Trip;
 import br.csi.viatio.repository.TripRepository;
 import br.csi.viatio.model.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 // Classe de serviço responsável por conter as regras de negócio relativas a gastos de viagens
 @Service
@@ -29,6 +30,7 @@ public class ExpenseService {
     }
 
     // Registra uma nova despesa ou atualiza uma despesa existente
+    @Transactional
     public Expense createExpense(ExpenseRequest dados, User user) {
         // Busca a viagem à qual a despesa pertence. Joga erro 404 se a viagem não existir
         Trip trip = tripRepository.findById(dados.tripId())
@@ -81,6 +83,7 @@ public class ExpenseService {
     }
 
     // Recupera a lista de despesas de uma viagem, validando a posse
+    @Transactional(readOnly = true)
     public List<Expense> listByTrip(UUID tripId, User user) {
         // Busca a viagem informada
         Trip trip = tripRepository.findById(tripId)
@@ -96,6 +99,7 @@ public class ExpenseService {
     }
 
     // Remove uma despesa pelo ID
+    @Transactional
     public void deleteExpense(UUID id, User user) {
         // Busca a despesa a ser removida. Se não achar, retorna 404
         Expense expense = expenseRepository.findById(id)

@@ -18,6 +18,7 @@ import br.csi.viatio.repository.WalletRepository;
 import br.csi.viatio.model.Expense;
 import br.csi.viatio.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 // regras de negócio das transações de moedas e cálculo do VET
 @Service
@@ -37,6 +38,7 @@ public class CurrencyTransactionService {
     }
 
     // Recalcula o saldo e a taxa média (VET) da carteira do usuário para uma moeda estrangeira
+    @Transactional
     public void recalculateWallet(User user, String currency) {
         // Busca todas as compras de moedas do usuário na moeda
         List<CurrencyTransaction> txs = transactionRepository.findByUserAndCurrency(user, currency);
@@ -121,6 +123,7 @@ public class CurrencyTransactionService {
     }
 
     // Registra uma nova compra de moeda estrangeira ou atualiza uma existente
+    @Transactional
     public CurrencyTransaction createTransaction(CurrencyTransactionRequest dados, User user) {
         CurrencyTransaction transaction;
         // Se a requisição contiver ID, busca a transação no banco (modo edição)
@@ -151,11 +154,13 @@ public class CurrencyTransactionService {
     }
 
     // Retorna a lista de todas as compras de moeda cadastradas para o usuário fornecido
+    @Transactional(readOnly = true)
     public List<CurrencyTransaction> listByUser(User user) {
         return transactionRepository.findByUser(user);
     }
 
     // Remove um lançamento de compra de moeda do banco
+    @Transactional
     public void deleteTransaction(UUID id, User user) {
         // Busca a transação ou joga erro 404
         CurrencyTransaction transaction = transactionRepository.findById(id)
