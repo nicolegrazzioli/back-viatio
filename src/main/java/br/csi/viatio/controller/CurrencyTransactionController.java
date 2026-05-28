@@ -6,12 +6,10 @@ import br.csi.viatio.model.CurrencyTransaction;
 import br.csi.viatio.dto.currencytransaction.CurrencyTransactionRequest;
 import br.csi.viatio.dto.currencytransaction.CurrencyTransactionResponse;
 import br.csi.viatio.model.User;
-import br.csi.viatio.repository.UserRepository;
 import br.csi.viatio.service.CurrencyTransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -24,26 +22,12 @@ import jakarta.validation.Valid;
 public class CurrencyTransactionController {
 
     private final CurrencyTransactionService transactionService;
-    private final UserRepository userRepository;
-
-    // Mérodo auxiliar para buscar as informações do usuário autenticado pelo token JWT
-    private User getAuthenticatedUser() {
-        // Busca o principal (objeto com os detalhes basicos do usuario autenticado a partir do token JWT)
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // transforma o objeto principal em UserDetais (padrao) e extrai nome (email)
-        String email = ((UserDetails) principal).getUsername();
-        // busca objeto User a partir do email
-        return userRepository.findByEmail(email);
-    }
 
     // ENDPOINT para registrar uma compra de moeda estrangeira
     // ResponseEntity = resposta HTTP terá um corpo de dados e codigo de status
     // spring le o corpo json enviado pelo app flutter e converte no objeto CurrencyTransactionRequest dados
     @PostMapping
-    public ResponseEntity<CurrencyTransactionResponse> create(@Valid @RequestBody CurrencyTransactionRequest dados) {
-        // Pega o usuário logado
-        User user = getAuthenticatedUser();
-        
+    public ResponseEntity<CurrencyTransactionResponse> create(@Valid @RequestBody CurrencyTransactionRequest dados, @AuthenticationPrincipal User user) {
         // Aciona o service para registrar a transação de compra associada ao usuário
         CurrencyTransaction transaction = transactionService.createTransaction(dados, user);
         
@@ -53,10 +37,7 @@ public class CurrencyTransactionController {
 
     // ENDPOINT para listar todas as transações de moedas do usuário logado
     @GetMapping
-    public ResponseEntity<List<CurrencyTransactionResponse>> listAll() {
-        // Pega o usuário atual
-        User user = getAuthenticatedUser();
-        
+    public ResponseEntity<List<CurrencyTransactionResponse>> listAll(@AuthenticationPrincipal User user) {
         // Busca a lista de transações do usuário no banco e converte em DTOs formatados
         // .stream().map(CurrencyTransactionResponse::new) - pega a lista de entidades originais do banco e passa cada uma pelo construtor do DTO CurrencyTransactionResponse
         List<CurrencyTransactionResponse> transactions = transactionService.listByUser(user)
@@ -69,10 +50,7 @@ public class CurrencyTransactionController {
 
     // ENDPOINT para remover uma compra de moeda específica pelo UUID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        // Pega o usuário logado na requisição
-        User user = getAuthenticatedUser();
-        
+    public ResponseEntity<Void> delete(@PathVariable UUID id, @AuthenticationPrincipal User user) {
         // Solicita a exclusão do registro ao serviço, validando se ele pertence ao usuário
         transactionService.deleteTransaction(id, user);
         

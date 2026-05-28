@@ -6,12 +6,10 @@ import br.csi.viatio.model.Trip;
 import br.csi.viatio.dto.trip.TripRequest;
 import br.csi.viatio.dto.trip.TripResponse;
 import br.csi.viatio.model.User;
-import br.csi.viatio.repository.UserRepository;
 import br.csi.viatio.service.TripService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -24,22 +22,10 @@ import java.util.List;
 public class TripController {
 
     private final TripService tripService;
-    private final UserRepository userRepository;
-
-    // Mérodo auxiliar para recuperar o usuário que está fazendo a requisição atual
-    // extrai o e-mail do token JWT validado pelo Spring Security e busca o usuário correspondente no banco
-    private User getAuthenticatedUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
-        return userRepository.findByEmail(email);
-    }
 
     // ENDPOINT para criar uma nova viagem
     @PostMapping
-    public ResponseEntity<TripResponse> create(@Valid @RequestBody TripRequest dados) {
-        // Pega as informações do usuário logado na requisição
-        User user = getAuthenticatedUser();
-        
+    public ResponseEntity<TripResponse> create(@Valid @RequestBody TripRequest dados, @AuthenticationPrincipal User user) {
         // Solicita ao serviço a criação do registro de viagem associada a este usuário
         Trip trip = tripService.createTrip(dados, user);
         
@@ -49,10 +35,7 @@ public class TripController {
 
     // ENDPOINT para listar todas as viagens associadas ao usuário logado
     @GetMapping
-    public ResponseEntity<List<TripResponse>> listAll() {
-        // Pega o usuário atual
-        User user = getAuthenticatedUser();
-        
+    public ResponseEntity<List<TripResponse>> listAll(@AuthenticationPrincipal User user) {
         // Busca as viagens do usuário no banco e converte a lista em DTOs simplificados
         List<TripResponse> trips = tripService.listByUser(user)
                 .stream()
@@ -64,10 +47,7 @@ public class TripController {
 
     // ENDPOINT para excluir uma viagem específica pelo seu identificador único UUID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        // Pega o usuário logado
-        User user = getAuthenticatedUser();
-        
+    public ResponseEntity<Void> delete(@PathVariable UUID id, @AuthenticationPrincipal User user) {
         // Solicita a remoção da viagem, validando se ela realmente pertence ao usuário atual
         tripService.deleteTrip(id, user);
         
