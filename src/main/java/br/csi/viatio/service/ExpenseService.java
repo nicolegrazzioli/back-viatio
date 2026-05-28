@@ -24,7 +24,7 @@ public class ExpenseService {
     private final TripRepository tripRepository;
     private final CurrencyTransactionService currencyTransactionService;
 
-    // Registra uma nova despesa ou atualiza uma despesa existente
+    // Registra uma nova despesa
     @Transactional
     public Expense createExpense(ExpenseRequest dados, User user) {
         // Busca a viagem à qual a despesa pertence. Joga erro 404 se a viagem não existir
@@ -36,20 +36,8 @@ public class ExpenseService {
             throw new ForbiddenException("Você não tem permissão para adicionar despesas nesta viagem.");
         }
 
-        Expense expense;
-        String oldCurrency = null;
-        // Se a requisição trouxer um ID de despesa, é uma atualização
-        if (dados.id() != null) {
-            expense = expenseRepository.findById(dados.id()).orElse(new Expense());
-            expense.setId(dados.id());
-            // Guarda a moeda que estava cadastrada antes (útil caso o usuário troque a moeda do gasto)
-            oldCurrency = expense.getCurrency();
-        } else {
-            // Caso contrário, instancia um novo objeto de despesa
-            expense = new Expense();
-        }
-
-        // Popula os dados da entidade
+        Expense expense = new Expense();
+        expense.setId(dados.id());
         expense.setTrip(trip);
         expense.setTitle(dados.title());
         expense.setAmount(dados.amount());
@@ -61,17 +49,56 @@ public class ExpenseService {
         expense.setAmountBrl(dados.amountBrl());
         expense.setPhotoPath(dados.photoPath());
 
-        // Salva o registro na tabela expenses do banco PostgreSQL
         Expense saved = expenseRepository.save(expense);
         
         // Recalcula o saldo da carteira para a moeda do gasto atual
         currencyTransactionService.recalculateWallet(user, saved.getCurrency());
+        
+        return saved;
+    }
 
-        // Se o usuário editou e mudou a moeda do gasto, recalcula também a carteira da moeda antiga
-        if (oldCurrency != null) {
-            if (!oldCurrency.equals(saved.getCurrency())) {
-                currencyTransactionService.recalculateWallet(user, oldCurrency);
-            }
+    // Edita uma despesa existente
+    @Transactional
+    public Expense updateExpense(UUID id, ExpenseRequest dados, User user) {
+        // Busca a despesa existente. Se não achar, retorna 404
+        Expense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Despesa não encontrada."));
+
+        // Garante que o usuário autenticado é o dono da despesa
+        if (!expense.getTrip().getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException("Você não tem permissão para editar esta despesa.");
+        }
+
+        // Guarda a moeda que estava cadastrada antes (caso o usuário troque a moeda do gasto)
+        String oldCurrency = expense.getCurrency();
+
+        // Se a viagem da despesa for alterada (transferir gasto), valida a nova viagem
+        Trip trip = tripRepository.findById(dados.tripId())
+                .orElseThrow(() -> new ResourceNotFoundException("Nova viagem não encontrada."));
+        if (!trip.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException("Você não tem permissão para associar a despesa a esta viagem.");
+        }
+
+        // Atualiza os dados
+        expense.setTrip(trip);
+        expense.setTitle(dados.title());
+        expense.setAmount(dados.amount());
+        expense.setCurrency(dados.currency());
+        expense.setCategory(dados.category());
+        expense.setDate(dados.date());
+        expense.setIsAverageCost(dados.isAverageCost());
+        expense.setExchangeRate(dados.exchangeRate());
+        expense.setAmountBrl(dados.amountBrl());
+        expense.setPhotoPath(dados.photoPath());
+
+        Expense saved = expenseRepository.save(expense);
+        
+        // Recalcula o saldo da carteira para a moeda atual do gasto
+        currencyTransactionService.recalculateWallet(user, saved.getCurrency());
+
+        // Se o usuário mudou a moeda do gasto, recalcula também a carteira da moeda antiga
+        if (!oldCurrency.equals(saved.getCurrency())) {
+            currencyTransactionService.recalculateWallet(user, oldCurrency);
         }
         
         return saved;

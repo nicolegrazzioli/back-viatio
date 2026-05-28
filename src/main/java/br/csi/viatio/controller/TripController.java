@@ -33,7 +33,16 @@ public class TripController {
         // Solicita ao serviço a criação do registro de viagem associada a este usuário
         Trip trip = tripService.createTrip(dados, user);
         
-        // Retorna a viagem salva formatada como TripResponse com status 200 OK
+        // Retorna a viagem salva formatada como TripResponse com status 201 CREATED
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(new TripResponse(trip));
+    }
+
+    // ENDPOINT para editar uma viagem existente
+    @Operation(summary = "Atualiza uma viagem existente usando seu UUID")
+    @PutMapping("/{id}")
+    public ResponseEntity<TripResponse> update(@PathVariable UUID id, @Valid @RequestBody TripRequest dados, @AuthenticationPrincipal User user) {
+        // Envia a requisição de atualização para o serviço, garantindo que o ID da URL seja usado
+        Trip trip = tripService.updateTrip(id, dados, user);
         return ResponseEntity.ok(new TripResponse(trip));
     }
 

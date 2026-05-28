@@ -33,7 +33,16 @@ public class ExpenseController {
         // Aciona o service para registrar a despesa associada ao usuário logado
         Expense expense = expenseService.createExpense(dados, user);
         
-        // Retorna os dados da despesa cadastrada formatados com status 200 OK
+        // Retorna os dados da despesa cadastrada formatados com status 201 CREATED
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(new ExpenseResponse(expense));
+    }
+
+    // ENDPOINT para editar uma despesa existente
+    @Operation(summary = "Atualiza uma despesa existente usando seu UUID")
+    @PutMapping("/{id}")
+    public ResponseEntity<ExpenseResponse> update(@PathVariable UUID id, @Valid @RequestBody ExpenseRequest dados, @AuthenticationPrincipal User user) {
+        // Envia a requisição de atualização para o serviço, passando o ID da URL
+        Expense expense = expenseService.updateExpense(id, dados, user);
         return ResponseEntity.ok(new ExpenseResponse(expense));
     }
 

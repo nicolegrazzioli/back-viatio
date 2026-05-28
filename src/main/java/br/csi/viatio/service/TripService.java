@@ -24,36 +24,46 @@ public class TripService {
     private final ExpenseRepository expenseRepository;
     private final CurrencyTransactionService currencyTransactionService;
 
-    // Cria ou edita uma viagem
+    // Cria uma nova viagem
     @Transactional
     public Trip createTrip(TripRequest dados, User user) {
-        Trip trip;
-        // Se a requisição contiver um ID, significa que é uma atualização de viagem existente
-        if (dados.id() != null) {
-            trip = repository.findById(dados.id()).orElse(new Trip());
-            trip.setId(dados.id());
-        } else {
-            // Caso contrário, é um novo cadastro
-            trip = new Trip();
-        }
-
-        // Preenche/atualiza os dados da entidade
+        Trip trip = new Trip();
+        trip.setId(dados.id());
         trip.setUser(user);
         trip.setTitle(dados.title());
         trip.setStartDate(dados.startDate());
         trip.setEndDate(dados.endDate());
         trip.setCoverType(dados.coverType());
 
-        // Salva as alterações no banco de dados (tabela trips)
+        return repository.save(trip);
+    }
+
+    // Edita uma viagem existente
+    @Transactional
+    public Trip updateTrip(UUID id, TripRequest dados, User user) {
+        // Busca a viagem pelo ID recebido na URL
+        Trip trip = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Viagem não encontrada."));
+        
+        // Garante que o usuário logado é o dono da viagem
+        if (!trip.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException("Você não tem permissão para editar esta viagem.");
+        }
+
+        // Atualiza os dados da entidade
+        trip.setTitle(dados.title());
+        trip.setStartDate(dados.startDate());
+        trip.setEndDate(dados.endDate());
+        trip.setCoverType(dados.coverType());
+
+        // Salva as alterações
         Trip savedTrip = repository.save(trip);
         
-        // Se foi uma edição, recalcula o VET das moedas dessa viagem, pois a alteração das datas da viagem pode afetar o cálculo
-        if (dados.id() != null) {
-            List<Expense> expenses = expenseRepository.findByTrip(savedTrip);
-            expenses.stream().map(e -> e.getCurrency()).distinct().forEach(currency -> {
-                currencyTransactionService.recalculateWallet(user, currency);
-            });
-        }
+        // Recalcula o VET das moedas dessa viagem, pois a alteração das datas pode afetar a cotação
+        List<Expense> expenses = expenseRepository.findByTrip(savedTrip);
+        expenses.stream().map(e -> e.getCurrency()).distinct().forEach(currency -> {
+            currencyTransactionService.recalculateWallet(user, currency);
+        });
         
         return savedTrip;
     }
