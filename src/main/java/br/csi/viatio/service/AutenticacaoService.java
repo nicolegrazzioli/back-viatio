@@ -1,7 +1,7 @@
 package br.csi.viatio.service;
 import br.csi.viatio.model.User;
 import br.csi.viatio.repository.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 // Classe de serviço do Spring Security utilizada para carregar dados do usuário durante a autenticação
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AutenticacaoService implements UserDetailsService {
     private final UserRepository repository;
 

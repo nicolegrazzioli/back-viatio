@@ -4,20 +4,17 @@ import java.util.UUID;
 
 import br.csi.viatio.model.User;
 import br.csi.viatio.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
 // Classe de serviço responsável pelas operações de CRUD de usuários
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository repository;
-
-    // Construtor com injeção automática de dependência do repositório de usuários
-    public UserService(UserRepository repository) {
-        this.repository = repository;
-    }
 
     // Busca e retorna uma lista com todos os usuários cadastrados
     public List<User> findAll() {

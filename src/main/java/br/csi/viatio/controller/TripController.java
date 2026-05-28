@@ -7,7 +7,7 @@ import br.csi.viatio.dto.trip.TripRequest;
 import br.csi.viatio.dto.trip.TripResponse;
 import br.csi.viatio.model.User;
 import br.csi.viatio.service.TripService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import java.util.List;
 // Controlador REST para gerenciar as viagens cadastradas pelos usuários
 @RestController
 @RequestMapping("/trips")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TripController {
 
     private final TripService tripService;

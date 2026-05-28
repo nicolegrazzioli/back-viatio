@@ -6,7 +6,7 @@ import br.csi.viatio.dto.expense.ExpenseRequest;
 import br.csi.viatio.dto.expense.ExpenseResponse;
 import br.csi.viatio.model.User;
 import br.csi.viatio.service.ExpenseService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/expenses")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExpenseController {
 
     private final ExpenseService expenseService;

@@ -17,25 +17,19 @@ import br.csi.viatio.repository.TripRepository;
 import br.csi.viatio.repository.WalletRepository;
 import br.csi.viatio.model.Expense;
 import br.csi.viatio.repository.ExpenseRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 // regras de negócio das transações de moedas e cálculo do VET
 @Service
+@RequiredArgsConstructor
 public class CurrencyTransactionService {
 
     private final CurrencyTransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
     private final ExpenseRepository expenseRepository;
     private final TripRepository tripRepository;
-
-    // Construtor com as dependências do banco injetadas pelo Spring
-    public CurrencyTransactionService(CurrencyTransactionRepository transactionRepository, WalletRepository walletRepository, ExpenseRepository expenseRepository, TripRepository tripRepository) {
-        this.transactionRepository = transactionRepository;
-        this.walletRepository = walletRepository;
-        this.expenseRepository = expenseRepository;
-        this.tripRepository = tripRepository;
-    }
 
     // Recalcula o saldo e a taxa média (VET) da carteira do usuário para uma moeda estrangeira
     @Transactional

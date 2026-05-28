@@ -11,23 +11,18 @@ import br.csi.viatio.dto.expense.ExpenseRequest;
 import br.csi.viatio.model.Trip;
 import br.csi.viatio.repository.TripRepository;
 import br.csi.viatio.model.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 // Classe de serviço responsável por conter as regras de negócio relativas a gastos de viagens
 @Service
+@RequiredArgsConstructor
 public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
     private final TripRepository tripRepository;
     private final CurrencyTransactionService currencyTransactionService;
-
-    // Construtor utilizado pelo Spring para injetar as dependências necessárias de banco de dados e outros serviços
-    public ExpenseService(ExpenseRepository expenseRepository, TripRepository tripRepository, CurrencyTransactionService currencyTransactionService) {
-        this.expenseRepository = expenseRepository;
-        this.tripRepository = tripRepository;
-        this.currencyTransactionService = currencyTransactionService;
-    }
 
     // Registra uma nova despesa ou atualiza uma despesa existente
     @Transactional

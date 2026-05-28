@@ -3,7 +3,7 @@ package br.csi.viatio.controller;
 import br.csi.viatio.model.User;
 import br.csi.viatio.dto.wallet.WalletResponse;
 import br.csi.viatio.service.WalletService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +15,7 @@ import java.util.List;
 // Controlador REST responsável por exibir a carteira de moedas (saldos e VETs)
 @RestController
 @RequestMapping("/wallets")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WalletController {
 
     private final WalletService walletService;

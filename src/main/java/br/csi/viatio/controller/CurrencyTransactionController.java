@@ -7,7 +7,7 @@ import br.csi.viatio.dto.currencytransaction.CurrencyTransactionRequest;
 import br.csi.viatio.dto.currencytransaction.CurrencyTransactionResponse;
 import br.csi.viatio.model.User;
 import br.csi.viatio.service.CurrencyTransactionService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import jakarta.validation.Valid;
 // Controlador REST para gerenciar as transações de compra de moedas estrangeiras
 @RestController
 @RequestMapping("/currency-transactions")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CurrencyTransactionController {
 
     private final CurrencyTransactionService transactionService;

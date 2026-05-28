@@ -6,7 +6,7 @@ import br.csi.viatio.dto.user.TokenResponse;
 import br.csi.viatio.model.User;
 import br.csi.viatio.repository.UserRepository;
 import br.csi.viatio.dto.user.UserResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,9 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 // Define que a classe lida com requisições HTTP REST e retorna os dados diretamente em formato JSON
 @RestController
 // Mapeia todas as rotas desta classe para iniciar com /auth
+// Mapeia todas as rotas desta classe para iniciar com /auth
 @RequestMapping("/auth")
 // Lombok gera automaticamente o construtor com os campos finais (injeção de dependência)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthenticationManager manager;
