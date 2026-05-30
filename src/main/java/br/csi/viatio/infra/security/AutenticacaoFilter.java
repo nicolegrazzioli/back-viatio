@@ -28,6 +28,7 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = recuperarToken(request);
+        System.out.println("Token recebido: " + token);
 
         if (token != null) {
             try {

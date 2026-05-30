@@ -15,8 +15,7 @@ import java.time.ZoneOffset;
 
 @Service
 public class TokenServiceJWT {
-    @Value("${api.security.token.secret}")
-    private String secret;
+    private String secret = "Viatio_secret_key_123";
 
     public String gerarToken(User user) {
         try {
@@ -36,7 +35,7 @@ public class TokenServiceJWT {
     }
 
     private Instant dataExpiracao() {
-        return LocalDateTime.now().plusHours(24).toInstant(ZoneOffset.of("-03:00"));
+        return Instant.now().plusSeconds(86400); // 24 hours
     }
 
     public String getSubject(String token) {
@@ -48,7 +47,8 @@ public class TokenServiceJWT {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException e) {
-            throw new RuntimeException("Token inválido ou expirado");
+            e.printStackTrace();
+            throw new RuntimeException("Token inválido ou expirado", e);
         }
     }
 }
